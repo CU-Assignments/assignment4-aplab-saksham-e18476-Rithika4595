@@ -1,0 +1,35 @@
+import java.util.*;
+
+class Solution {
+    public List<List<Integer>> getSkyline(int[][] buildings) {
+        List<int[]> points = new ArrayList<>();
+        for (int[] b : buildings) {
+            points.add(new int[]{b[0], -b[2]}); // Start of building
+            points.add(new int[]{b[1], b[2]});  // End of building
+        }
+        
+        points.sort((a, b) -> (a[0] == b[0]) ? Integer.compare(a[1], b[1]) : Integer.compare(a[0], b[0]));
+        
+        List<List<Integer>> result = new ArrayList<>();
+        TreeMap<Integer, Integer> heightMap = new TreeMap<>(Collections.reverseOrder());
+        heightMap.put(0, 1);
+        int prevMax = 0;
+
+        for (int[] p : points) {
+            if (p[1] < 0) 
+                heightMap.put(-p[1], heightMap.getOrDefault(-p[1], 0) + 1);
+            else {
+                if (heightMap.get(p[1]) == 1) heightMap.remove(p[1]);
+                else heightMap.put(p[1], heightMap.get(p[1]) - 1);
+            }
+
+            int currMax = heightMap.firstKey();
+            if (currMax != prevMax) {
+                result.add(Arrays.asList(p[0], currMax));
+                prevMax = currMax;
+            }
+        }
+        
+        return result;
+    }
+}
